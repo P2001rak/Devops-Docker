@@ -15,11 +15,11 @@ COPY requirements.txt /app
 RUN /app/venv/bin/pip install --upgrade pip && \
     /app/venv/bin/pip install --break-system-packages -r requirements.txt
 
-# Copy the rest of the app (including `devops` directory)
+# Copy the entire app (including devops folder with manage.py)
 COPY devops /app/devops
 
-# Apply database migrations (automatically)
-RUN /app/venv/bin/python manage.py migrate
+# Apply migrations (correct path to manage.py inside devops folder)
+RUN /app/venv/bin/python /app/devops/manage.py migrate
 
 # Start the Django development server
-CMD ["/app/venv/bin/python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/app/venv/bin/python", "/app/devops/manage.py", "runserver", "0.0.0.0:8000"]
