@@ -10,20 +10,16 @@ RUN apt-get update && \
 # Create and activate a virtual environment
 RUN python3 -m venv /app/venv
 
-# Activate venv and install dependencies
+# Copy the requirements.txt and install dependencies inside the virtual environment
 COPY requirements.txt /app
 RUN /app/venv/bin/pip install --upgrade pip && \
     /app/venv/bin/pip install --break-system-packages -r requirements.txt
 
-# Set the working directory to devops
-WORKDIR /app/devops
+# Copy the rest of the app (including `devops` directory)
 COPY devops /app/devops
 
-# Use virtual environment Python
-ENTRYPOINT ["/app/venv/bin/python"]
-CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+# Apply database migrations (automatically)
+RUN /app/venv/bin/python manage.py migrate
 
-
-
-
-
+# Start the Django development server
+CMD ["/app/venv/bin/python", "manage.py", "runserver", "0.0.0.0:8000"]
